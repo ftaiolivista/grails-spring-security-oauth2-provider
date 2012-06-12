@@ -37,7 +37,7 @@ class SpringSecurityOAuth2ProviderUtility {
 			client.authorizedGrantTypes = clientConfig.authorizedGrantTypes ?: defaultConfig.authorizedGrantTypes
 			client.scope = clientConfig.scope ?: defaultConfig.scope
 			client.resourceIds = clientConfig.resourceIds ?: defaultConfig.resourceIds
-			client.webServerRedirectUri = clientConfig.registeredRedirectUri ?: defaultConfig.registeredRedirectUri
+			client.registeredRedirectUri = clientConfig.registeredRedirectUri ?: defaultConfig.registeredRedirectUri
 			client.authorities = clientConfig.authorities ?: defaultConfig.authorities
 			
 			// Add to client details service

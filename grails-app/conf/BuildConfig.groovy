@@ -34,13 +34,16 @@ grails.project.dependency.resolution = {
 		compile('org.springframework.security:spring-security-crypto:3.1.0.RELEASE') {
 			excludes 'spring-core', 'commons-logging'
 		}
-		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.0.M5', {
+		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.0.M6', {
 			excludes "spring-security-core", "spring-security-web"
 		}
 		compile 'net.sf.ezmorph:ezmorph:1.0.6', {
 			excludes "commons-lang"
 			export = false
 		}
+		
+		compile 'org.codehaus.jackson:jackson-core-asl:1.9.3'
+		compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.3'
 	}
 	
 	plugins {
@@ -57,6 +60,6 @@ grails.project.dependency.resolution = {
 		provided ':svn:1.0.2', {
 			export = false
 		}
-		compile ':spring-security-core:1.2.7.2'
+		compile ':spring-security-core:1.2.8.4'
 	}
 }
