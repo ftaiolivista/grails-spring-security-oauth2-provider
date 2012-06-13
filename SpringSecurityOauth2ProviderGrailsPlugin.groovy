@@ -115,7 +115,7 @@ OAuth2 Provider support for the Spring Security plugin.
 				) {
 			
 			oauth.'authorization-code'(
-				'authorization-code-services-ref':"authorizationCodeServices",
+				'services-ref':"authorizationCodeServices",
 				'disabled':!conf.oauthProvider.grantTypes.authorizationCode				
 				)
 			
@@ -135,49 +135,12 @@ OAuth2 Provider support for the Spring Security plugin.
 		}
 					
 		xmlns securityNs:"http://www.springframework.org/schema/security"
-//			
-//		securityNs.'http'(
-//			'pattern': "/oauth/token",
-//			'create-session': 'never',
-//			'authentication-manager-ref': 'authenticationManager'
-//			){
-//			
-//			securityNs.'intercept-url'(
-//				'pattern':"/oauth/token",
-//				'access':"IS_AUTHENTICATED_FULLY"
-//				)
-//			
-//			securityNs.'anonymous'( 'enabled':"false" )
-//			
-//			securityNs.'http-basic'()
-//			
-//			//include this only if you need to authenticate clients via request parameters
-//			securityNs.'custom-filter'(
-//				'ref':"clientCredentialsTokenEndpointFilter", 
-//				'before':"BASIC_AUTH_FILTER"
-//				)
-//			securityNs.'access-denied-handler'('ref':"accessDeniedHandler")
-//			}
-		
-		// {"error":{"type":"ServletException","message":"org.springframework.security.core.userdetails.User.<init>(Ljava/lang/String;Ljava/lang/String;Ljava/util/Collection;)V"}}
+
 		clientDetailsUserService(ClientDetailsUserDetailsService, ref('clientDetailsService'))
-//		
-//		
-//		// {"error":{"type":"ServletException","message":"org.springframework.security.core.userdetails.User.<init>(Ljava/lang/String;Ljava/lang/String;Ljava/util/Collection;)V"}}
-//		clientDetailsUserProvider(DaoAuthenticationProvider){
-//			userDetailsService = ref('clientDetailsUserService')
-//			}
-				
-//		xmlns securityNs:"http://www.springframework.org/schema/security"
+
 		securityNs.'authentication-manager'(id:'clientAuthenticationManager'){
 			securityNs.'authentication-provider'('user-service-ref':"clientDetailsUserService")
 			}					
-		
-// {"error":{"type":"ServletException","message":"org.springframework.security.core.userdetails.User.<init>(Ljava/lang/String;Ljava/lang/String;Ljava/util/Collection;)V"}}
-//		clientAuthenticationManager(ProviderManager) {
-//			java.util.List pr = [ref('clientDetailsUserProvider')]
-//			providers = pr
-//		}
 			
 		// Register endpoint URL filter since we define the URLs above
 		clientCredentialsTokenEndpointFilter(ClientCredentialsTokenEndpointFilter){
