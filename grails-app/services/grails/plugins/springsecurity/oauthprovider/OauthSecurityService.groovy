@@ -1,6 +1,7 @@
 package grails.plugins.springsecurity.oauthprovider
 
 import org.springframework.security.oauth2.provider.OAuth2Authentication
+import org.springframework.security.oauth2.provider.AuthorizationRequest
 
 class OauthSecurityService {
 
@@ -9,6 +10,20 @@ class OauthSecurityService {
 	boolean isOAuth(){
 		springSecurityService.authentication instanceof OAuth2Authentication
 	}
+	
+	OAuth2Authentication getAuthentication() { 
+		isOAuth()?springSecurityService.authentication:null
+		}
+	
+	AuthorizationRequest getAuthorizationRequest() { 
+		getAuthentication()?.authorizationRequest
+		}
+	
+	List<String> getScopes(){
+		isOAuth()?getAuthorizationRequest()?.scope:[]
+		}
+	
+	def getPrincipal() { isOAuth()?getAuthentication().principal:null }
 
 	boolean isOAuthClientAuth() {
 		def authentication = springSecurityService.authentication
@@ -39,12 +54,9 @@ class OauthSecurityService {
 	}
 
 	boolean hasAnyScope(def scopes) {
-		def authentication = springSecurityService.authentication		
-		if (authentication instanceof OAuth2Authentication) {			
-			def clientAuthentication = authentication.authorizationRequest				
-			return clientAuthentication.getScope().intersect( scopes )			
-		}
-		false
+		getScopes().intersect( scopes )					
 	}
+	
+	
 	
 }
