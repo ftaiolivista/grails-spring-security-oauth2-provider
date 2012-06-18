@@ -4,26 +4,38 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication
 import org.springframework.security.oauth2.provider.AuthorizationRequest
 
 class OauthSecurityService {
+	
+	static transactional = false
 
 	def springSecurityService
 
 	boolean isOAuth(){
 		springSecurityService.authentication instanceof OAuth2Authentication
 	}
-	
-	OAuth2Authentication getAuthentication() { 
+
+	OAuth2Authentication getAuthentication() {
 		isOAuth()?springSecurityService.authentication:null
-		}
-	
-	AuthorizationRequest getAuthorizationRequest() { 
+	}
+
+	boolean isLoggedIn() {
+		springSecurityService.isLoggedIn()
+	}
+
+	String getUsername(){
+		springSecurityService.principal instanceof String ?[username:null]:springSecurityService.principal.username
+	}
+
+	AuthorizationRequest getAuthorizationRequest() {
 		getAuthentication()?.authorizationRequest
-		}
-	
-	List<String> getScopes(){
+	}
+
+	def getScopes(){
 		isOAuth()?getAuthorizationRequest()?.scope:[]
-		}
-	
-	def getPrincipal() { isOAuth()?getAuthentication().principal:null }
+	}
+
+	def getPrincipal() {
+		isOAuth()?getAuthentication().principal:null
+	}
 
 	boolean isOAuthClientAuth() {
 		def authentication = springSecurityService.authentication
@@ -54,9 +66,11 @@ class OauthSecurityService {
 	}
 
 	boolean hasAnyScope(def scopes) {
-		getScopes().intersect( scopes )					
+		getScopes().intersect( scopes )
 	}
 	
-	
+	boolean hasScope(def scope){
+		scope in getScopes()
+		}
 	
 }
