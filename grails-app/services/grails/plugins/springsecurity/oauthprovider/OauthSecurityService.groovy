@@ -2,14 +2,12 @@ package grails.plugins.springsecurity.oauthprovider
 
 import org.springframework.security.oauth2.provider.OAuth2Authentication
 import org.springframework.security.oauth2.provider.AuthorizationRequest
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 
 class OauthSecurityService {
 	
 	static transactional = false
 
 	def springSecurityService
-	def grailsApplication
 
 	boolean isOAuth(){
 		springSecurityService.authentication instanceof OAuth2Authentication
@@ -26,10 +24,6 @@ class OauthSecurityService {
 	String getUsername(){
 		springSecurityService.principal instanceof String ?[username:null]:springSecurityService.principal.username
 	}
-	
-	String getUserID(){
-		springSecurityService.principal instanceof String ?[id:null]:springSecurityService.principal?.id
-	}
 
 	AuthorizationRequest getAuthorizationRequest() {
 		getAuthentication()?.authorizationRequest
@@ -41,12 +35,6 @@ class OauthSecurityService {
 
 	def getPrincipal() {
 		isOAuth()?getAuthentication().principal:null
-	}
-	
-	Object getCurrentUser() {
-		if (!isLoggedIn()) { return null }
-		String className = SpringSecurityUtils.securityConfig.userLookup.userDomainClassName
-		grailsApplication.getClassForName(className).get(principal.id)
 	}
 
 	boolean isOAuthClientAuth() {
