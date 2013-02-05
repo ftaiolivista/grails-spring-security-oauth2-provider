@@ -34,7 +34,7 @@ grails.project.dependency.resolution = {
 		compile('org.springframework.security:spring-security-crypto:3.1.0.RELEASE') {
 			excludes 'spring-core', 'commons-logging'
 		}
-		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.0.M6', {
+		compile 'org.springframework.security.oauth:spring-security-oauth2:1.0.1.RELEASE', {
 			excludes "spring-security-core", "spring-security-web"
 		}
 		compile 'net.sf.ezmorph:ezmorph:1.0.6', {

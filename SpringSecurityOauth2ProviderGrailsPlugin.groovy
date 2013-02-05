@@ -18,13 +18,14 @@ import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCo
 import org.springframework.security.oauth2.provider.BaseClientDetails
 import org.springframework.security.oauth2.provider.InMemoryClientDetailsService
 import org.springframework.security.oauth2.provider.token.InMemoryTokenStore
-import org.springframework.security.oauth2.provider.token.RandomValueTokenServices
-import org.springframework.security.oauth2.provider.filter.OAuth2ExceptionHandlerFilter
-import org.springframework.security.oauth2.provider.filter.OAuth2ProtectedResourceFilter
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices
+//import org.springframework.security.oauth2.provider.filter.OAuth2ExceptionHandlerFilter
+import grails.plugins.springsecurity.oauthprovider.GormTokenServices
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter
 import org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler
 
 import grails.plugins.springsecurity.oauthprovider.SpringSecurityOAuth2ProviderUtility
-import org.springframework.security.oauth2.provider.filter.ClientCredentialsTokenEndpointFilter
+import org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter
 import org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -39,7 +40,7 @@ import org.springframework.http.converter.json.MappingJacksonHttpMessageConverte
 class SpringSecurityOauth2ProviderGrailsPlugin {
 	static Logger log = Logger.getLogger('grails.app.bootstrap.BootStrap')
 	
-	def version = "1.0.0.M6"
+	def version = "1.0.0.RELEASE"
 	String grailsVersion = '1.2.2 > *'
 	
 	List pluginExcludes = [
@@ -92,14 +93,18 @@ OAuth2 Provider support for the Spring Security plugin.
 		
 		clientDetailsService(InMemoryClientDetailsService)
 		tokenStore(InMemoryTokenStore)
-		tokenServices(RandomValueTokenServices) {
+		tokenServices(GormTokenServices) {
 			tokenStore = ref("tokenStore")
+			clientDetailsService = ref("clientDetailsService")
 			accessTokenValiditySeconds = conf.oauthProvider.tokenServices.accessTokenValiditySeconds
 			refreshTokenValiditySeconds = conf.oauthProvider.tokenServices.refreshTokenValiditySeconds
 			reuseRefreshToken = conf.oauthProvider.tokenServices.reuseRefreshToken
 			supportRefreshToken = conf.oauthProvider.tokenServices.supportRefreshToken
+		}		
+		authorizationCodeServices(InMemoryAuthorizationCodeServices)		
+		userApprovalHandler(TokenServicesUserApprovalHandler){
+			tokenServices = ref("tokenServices")
 		}
-		authorizationCodeServices(InMemoryAuthorizationCodeServices)
 		
 		// Oauth namespace
 		xmlns oauth:"http://www.springframework.org/schema/security/oauth2"
@@ -110,7 +115,7 @@ OAuth2 Provider support for the Spring Security plugin.
 				'authorization-endpoint-url':conf.oauthProvider.authorizationEndpointUrl,
 				'user-approval-page':conf.oauthProvider.userApprovalEndpointUrl,
 				'approval-parameter-name':conf.oauthProvider.authorizationCode.approvalParameterName,
-//				'user-approval-handler-ref': 'userApprovalHandler',
+				'user-approval-handler-ref': 'userApprovalHandler',
 				'token-endpoint-url':conf.oauthProvider.tokenEndpointUrl
 				) {
 			
@@ -141,24 +146,19 @@ OAuth2 Provider support for the Spring Security plugin.
 		securityNs.'authentication-manager'(id:'clientAuthenticationManager'){
 			securityNs.'authentication-provider'('user-service-ref':"clientDetailsUserService")
 			}					
+		
+		oauth.'resource-server'(
+			'id': 'resourceServerFilter', 
+			'resource-id': 'likella',
+			'token-services-ref': 'tokenServices')
+		
+		SpringSecurityUtils.registerFilter 'resourceServerFilter', conf.oauthProvider.filterStartPosition + 1
 			
 		// Register endpoint URL filter since we define the URLs above
 		clientCredentialsTokenEndpointFilter(ClientCredentialsTokenEndpointFilter){
 			authenticationManager = ref('clientAuthenticationManager')
-			}
-		SpringSecurityUtils.registerFilter 'clientCredentialsTokenEndpointFilter', conf.oauthProvider.filterStartPosition + 4
-		
-		SpringSecurityUtils.registerFilter 'oauth2EndpointUrlFilter',
-				conf.oauthProvider.filterStartPosition + 1
-				
-		oauth2ExceptionHandlerFilter(OAuth2ExceptionHandlerFilter)
-		SpringSecurityUtils.registerFilter 'oauth2ExceptionHandlerFilter',
-				conf.oauthProvider.filterStartPosition + 2
-		oauth2ProtectedResourceFilter(OAuth2ProtectedResourceFilter) {
-			tokenServices = ref("tokenServices")
-		}
-		SpringSecurityUtils.registerFilter 'oauth2ProtectedResourceFilter',
-				conf.oauthProvider.filterStartPosition + 3
+			}		
+		SpringSecurityUtils.registerFilter 'clientCredentialsTokenEndpointFilter', conf.oauthProvider.filterStartPosition + 2								
 		
 		log.debug "... done configured Spring Security OAuth2 provider"
 		
