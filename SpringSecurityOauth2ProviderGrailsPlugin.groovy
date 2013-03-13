@@ -123,7 +123,9 @@ OAuth2 Provider support for the Spring Security plugin.
 				'services-ref':"authorizationCodeServices",
 				'disabled':!conf.oauthProvider.grantTypes.authorizationCode				
 				)
-			
+			oauth.'custom-grant'(
+				'token-granter-ref': "deviceCodeGranter"
+				)
 			oauth.'implicit'(
 				'disabled':!conf.oauthProvider.grantTypes.implicit
 			)
