@@ -106,9 +106,11 @@ OAuth2 Provider support for the Spring Security plugin.
 			tokenServices = ref("tokenServices")
 		}
 		
+		redirectResolver(org.springframework.security.oauth2.provider.endpoint.DefaultRedirectResolver)
+		
 		// Oauth namespace
 		xmlns oauth:"http://www.springframework.org/schema/security/oauth2"
-		
+						
 		oauth.'authorization-server'(
 				'client-details-service-ref':"clientDetailsService",
 				'token-services-ref':"tokenServices",
@@ -116,7 +118,8 @@ OAuth2 Provider support for the Spring Security plugin.
 				'user-approval-page':conf.oauthProvider.userApprovalEndpointUrl,
 				'approval-parameter-name':conf.oauthProvider.authorizationCode.approvalParameterName,
 				'user-approval-handler-ref': 'userApprovalHandler',
-				'token-endpoint-url':conf.oauthProvider.tokenEndpointUrl
+				'token-endpoint-url':conf.oauthProvider.tokenEndpointUrl,
+				'redirect-resolver-ref': 'redirectResolver' 
 				) {
 			
 			oauth.'authorization-code'(
