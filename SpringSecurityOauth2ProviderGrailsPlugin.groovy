@@ -77,6 +77,7 @@ OAuth2 Provider support for the Spring Security plugin.
 	String documentation = 'http://grails.org/plugin/spring-security-oauth2-provider'
 
 	def doWithSpring = {
+
 		def conf = SpringSecurityUtils.securityConfig
 		if (!conf || !conf.active) {
 			return
@@ -140,6 +141,11 @@ OAuth2 Provider support for the Spring Security plugin.
 				'authentication-manager-ref':'authenticationManager',
 				'disabled':!conf.oauthProvider.grantTypes.password
 			)
+			for(granter in conf.oauthProvider.customGreantTypes){
+				oauth.'custom-grant'(
+					'token-granter-ref': "${granter}TokenGranter"
+				)
+			}
 		}
 					
 		xmlns securityNs:"http://www.springframework.org/schema/security"

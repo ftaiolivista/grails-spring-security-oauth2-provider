@@ -41,6 +41,7 @@ security {
 			clientCredentials = true
 			password = true
 		}
+		customGreantTypes = [] //[ 'deviceCode' ] convetion to the grant type bean deviceCode=>deviceCodeTokenGranter
 		defaultClientConfig {
 			resourceIds = []
 			authorizedGrantTypes = ["authorization_code", "refresh_token"]

@@ -75,21 +75,22 @@ class GormTokenServices implements AuthorizationServerTokenServices, ResourceSer
 			// Clients might be holding existing refresh tokens, so we re-use it in the case that the old access token
 			// expired.
 			if (refreshToken == null) {
-				refreshToken = createRefreshToken(authentication);
+				refreshToken = createRefreshToken(authentication)
+				if (refreshToken != null) {
+					tokenStore.storeRefreshToken(refreshToken, authentication)
+				}
 			}
 			// But the refresh token itself might need to be re-issued if it has expired.
 			else if (refreshToken instanceof ExpiringOAuth2RefreshToken) {
 				ExpiringOAuth2RefreshToken expiring = (ExpiringOAuth2RefreshToken) refreshToken;
 				if (System.currentTimeMillis() > expiring.getExpiration().getTime()) {
-					refreshToken = createRefreshToken(authentication);
+					refreshToken = createRefreshToken(authentication)
 				}
 			}
 	
-			OAuth2AccessToken accessToken = createAccessToken(authentication, refreshToken);
-			tokenStore.storeAccessToken(accessToken, authentication);
-			if (refreshToken != null) {
-				tokenStore.storeRefreshToken(refreshToken, authentication);
-			}
+			OAuth2AccessToken accessToken = createAccessToken(authentication, refreshToken)
+			tokenStore.storeAccessToken(accessToken, authentication)
+			
 			out = accessToken
 			return
 		}
